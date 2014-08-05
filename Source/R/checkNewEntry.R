@@ -416,14 +416,19 @@ checkNewEntry <- function(cholera.id,out.file=NULL,append.log=TRUE){
     ## check that ISO_A2 is same as description file if there is one
     iso.A2.indices <- grep("ISO_A2_L\\d+",names(desc),perl=T)
     if (length(iso.A2.indices) > 0){
-        ## for each enclosing A2 level in DESC, check that it is in the EPI file
-        for (i in seq_along(iso.A2.indices)){
-            isoA2.name <- names(desc)[iso.A2.indices[i]]
-            if (any(desc[isoA2.name] != epi[isoA2.name])){
-                current.warning.message <- sprintf("%s doesn't match in EPI and DESC files. Any ISO-A2 level included in the DESC file should be the same in all EPI entries",isoA2.name)
-                my.warnings <- c(my.warnings,current.warning.message)
-                cat(paste0(current.warning.message,"\n"))
-            }
+      ## even if the name is there make sure the entry isn't blank
+        blank.A2s <- which(desc[iso.A2.indices]=="" |is.na(desc[iso.A2.indices]))
+        iso.A2.indices <-iso.A2.indices[-blank.A2s]
+        if(length(iso.A2.indices)>0){
+         ## for each enclosing A2 level in DESC, check that it is in the EPI file
+          for (i in seq_along(iso.A2.indices)){
+             isoA2.name <- names(desc)[iso.A2.indices[i]]
+              if (any(desc[isoA2.name] != epi[isoA2.name])){
+                  current.warning.message <- sprintf("%s doesn't match in EPI and DESC files. Any ISO-A2 level included in the DESC file should be the same in all EPI entries",isoA2.name)
+                  my.warnings <- c(my.warnings,current.warning.message)
+                  cat(paste0(current.warning.message,"\n"))
+              }
+          }
         }
     }
 
